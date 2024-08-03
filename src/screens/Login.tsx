@@ -1,16 +1,35 @@
 import React, {useState} from 'react';
 import {View, Text, StyleSheet} from 'react-native';
 import {Input, Button} from 'react-native-elements';
+import {loginUser} from '../api';
+import {LoginUserRequest, Props} from '../types';
+import {storeToken} from '../utilities';
 
-export default function Login() {
+export default function Login({navigation}: Props) {
   const [creds, setCreds] = useState({
     phone: '',
     password: '',
   });
 
-  const handleLogin = () => {
-    console.log("Loggedin")
-  }
+  const handleLogin = async () => {
+    try {
+      const loginData: LoginUserRequest = {
+        mobile: creds.phone,
+        password: creds.password,
+      };
+
+      const loginResponse = await loginUser(loginData);
+      console.log('User logged in successfully:', loginResponse);
+      navigation.navigate('Home', {message: loginResponse.message});
+      await storeToken(loginResponse.token);
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        console.error('Error:', JSON.stringify(error));
+      } else {
+        console.error('An unknown error occurred');
+      }
+    }
+  };
 
   return (
     <View style={styles.container}>
@@ -30,14 +49,13 @@ export default function Login() {
         onChangeText={(text: string) => setCreds({...creds, password: text})}
       />
 
-        <Button
+      <Button
         title="Login"
         containerStyle={styles.buttonContainer}
         buttonStyle={styles.registerButton}
         titleStyle={styles.registerButtonTitle}
         onPress={handleLogin}
       />
-
     </View>
   );
 }

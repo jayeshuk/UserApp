@@ -1,5 +1,12 @@
 import React, {useState} from 'react';
-import {View, StyleSheet, Alert, Text} from 'react-native';
+import {
+  View,
+  StyleSheet,
+  Alert,
+  Text,
+  ScrollView,
+  SafeAreaView,
+} from 'react-native';
 import {Input, Button} from 'react-native-elements';
 import appleAuth, {
   AppleRequestOperation,
@@ -7,8 +14,10 @@ import appleAuth, {
 } from '@invertase/react-native-apple-authentication';
 
 import SocialSignInButton from '../components/SocialSignInButton';
+import { registerUser } from '../api';
+import {RegisterUserRequest, Props} from '../types';
 
-const Registration = () => {
+const Registration = ({navigation}: Props) => {
   const [userData, setUserData] = useState({
     firstName: '',
     lastName: '',
@@ -37,57 +46,87 @@ const Registration = () => {
     });
   };
 
+  const handleUserRegistration = async () => {
+    const registerData: RegisterUserRequest = {
+      first_name: userData.firstName,
+      last_name: userData.lastName,
+      password: userData.password,
+      mobile_number: userData.phone,
+    };
+
+    try {
+      const registerResponse = await registerUser(registerData);
+      console.log('User registered successfully:', registerResponse);
+      Alert.alert("User Registration Succeed");
+      navigation.navigate("Login");
+
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        console.error('Error:', JSON.stringify(error));
+      } else {
+        console.error('An unknown error occurred');
+      }
+    }
+  };
+
   return (
-    <View style={styles.container}>
-      <Input
-        placeholder="First Name"
-        leftIcon={{type: 'material', name: 'person'}}
-        containerStyle={styles.inputContainer}
-        value={userData.firstName}
-        onChangeText={(text: string) => handleValueChange('firstName', text)}
-      />
-      <Input
-        placeholder="Last Name"
-        leftIcon={{type: 'material', name: 'person-outline'}}
-        containerStyle={styles.inputContainer}
-        value={userData.lastName}
-        onChangeText={(text: string) => handleValueChange('lastName', text)}
-      />
-      <Input
-        placeholder="Mobile Number"
-        leftIcon={{type: 'material', name: 'phone'}}
-        containerStyle={styles.inputContainer}
-        value={userData.phone}
-        onChangeText={(text: string) => handleValueChange('phone', text)}
-      />
-      <Input
-        placeholder="Password"
-        leftIcon={{type: 'material', name: 'lock'}}
-        secureTextEntry
-        containerStyle={styles.inputContainer}
-        value={userData.password}
-        onChangeText={(text: string) => handleValueChange('password', text)}
-      />
+    <SafeAreaView>
+      <ScrollView>
+        <View style={styles.container}>
+          <Input
+            placeholder="First Name"
+            leftIcon={{type: 'material', name: 'person'}}
+            containerStyle={styles.inputContainer}
+            value={userData.firstName}
+            onChangeText={(text: string) =>
+              handleValueChange('firstName', text)
+            }
+          />
+          <Input
+            placeholder="Last Name"
+            leftIcon={{type: 'material', name: 'person-outline'}}
+            containerStyle={styles.inputContainer}
+            value={userData.lastName}
+            onChangeText={(text: string) => handleValueChange('lastName', text)}
+          />
+          <Input
+            placeholder="Mobile Number"
+            leftIcon={{type: 'material', name: 'phone'}}
+            containerStyle={styles.inputContainer}
+            value={userData.phone}
+            onChangeText={(text: string) => handleValueChange('phone', text)}
+          />
+          <Input
+            placeholder="Password"
+            leftIcon={{type: 'material', name: 'lock'}}
+            secureTextEntry
+            containerStyle={styles.inputContainer}
+            value={userData.password}
+            onChangeText={(text: string) => handleValueChange('password', text)}
+          />
 
-      <Button
-        title="Register"
-        containerStyle={styles.buttonContainer}
-        buttonStyle={styles.registerButton}
-        titleStyle={styles.registerButtonTitle}
-      />
+          <Button
+            title="Register"
+            containerStyle={styles.buttonContainer}
+            buttonStyle={styles.registerButton}
+            titleStyle={styles.registerButtonTitle}
+            onPress={handleUserRegistration}
+          />
 
-      <View style={styles.orView}>
-        <View style={styles.dividerLine} />
-        <Text style={{fontSize: 18}}>Or</Text>
-        <View style={styles.dividerLine} />
-      </View>
+          <View style={styles.orView}>
+            <View style={styles.dividerLine} />
+            <Text style={{fontSize: 18}}>Or</Text>
+            <View style={styles.dividerLine} />
+          </View>
 
-      <View style={styles.socialLoginContainer}>
-        <SocialSignInButton name="facebook" />
-        <SocialSignInButton name="google" />
-        <SocialSignInButton name="apple" />
-      </View>
-    </View>
+          <View style={styles.socialLoginContainer}>
+            <SocialSignInButton name="facebook" />
+            <SocialSignInButton name="google" />
+            <SocialSignInButton name="apple" />
+          </View>
+        </View>
+      </ScrollView>
+    </SafeAreaView>
   );
 };
 
@@ -96,6 +135,7 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     paddingHorizontal: 20,
+    marginTop: 40,
   },
   inputContainer: {
     marginBottom: 20,

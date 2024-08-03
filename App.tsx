@@ -11,13 +11,13 @@ function App() {
   return (
     <NavigationContainer>
       <Navigator>
-        <Screen name="Home" component={Home} options={{headerShown: false}} />
-        <Screen name="Login" component={Login} options={{headerShown: false}} />
         <Screen
           name="Registration"
           component={Registration}
           options={{headerShown: false}}
         />
+        <Screen name="Login" component={Login} options={{headerShown: false}} />
+        <Screen name="Home" component={Home} options={{headerShown: false}} />
       </Navigator>
     </NavigationContainer>
   );
