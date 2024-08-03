@@ -3,13 +3,15 @@ import {View, Text, StyleSheet} from 'react-native';
 import {Input, Button} from 'react-native-elements';
 import {loginUser} from '../api';
 import {LoginUserRequest, Props} from '../types';
-import {storeToken} from '../utilities';
+import {storeToken} from '../utils';
+import {useAuth} from '../context/AuthContext';
 
 export default function Login({navigation}: Props) {
   const [creds, setCreds] = useState({
     phone: '',
     password: '',
   });
+  const {setIsAuthenticated} = useAuth();
 
   const handleLogin = async () => {
     try {
@@ -20,8 +22,10 @@ export default function Login({navigation}: Props) {
 
       const loginResponse = await loginUser(loginData);
       console.log('User logged in successfully:', loginResponse);
-      navigation.navigate('Home', {message: loginResponse.message});
-      await storeToken(loginResponse.token);
+      await storeToken(JSON.stringify(loginResponse));
+
+      // Update the authentication state
+      setIsAuthenticated(true);
     } catch (error: unknown) {
       if (error instanceof Error) {
         console.error('Error:', JSON.stringify(error));

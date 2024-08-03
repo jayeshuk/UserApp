@@ -14,7 +14,7 @@ import appleAuth, {
 } from '@invertase/react-native-apple-authentication';
 
 import SocialSignInButton from '../components/SocialSignInButton';
-import { registerUser } from '../api';
+import {registerUser} from '../api';
 import {RegisterUserRequest, Props} from '../types';
 
 const Registration = ({navigation}: Props) => {
@@ -57,9 +57,8 @@ const Registration = ({navigation}: Props) => {
     try {
       const registerResponse = await registerUser(registerData);
       console.log('User registered successfully:', registerResponse);
-      Alert.alert("User Registration Succeed");
-      navigation.navigate("Login");
-
+      Alert.alert('User Registration Succeed');
+      navigation.navigate('Login');
     } catch (error: unknown) {
       if (error instanceof Error) {
         console.error('Error:', JSON.stringify(error));
@@ -67,6 +66,10 @@ const Registration = ({navigation}: Props) => {
         console.error('An unknown error occurred');
       }
     }
+  };
+
+  const handleUserSignIn = () => {
+    navigation.navigate('Login');
   };
 
   return (
@@ -113,6 +116,14 @@ const Registration = ({navigation}: Props) => {
             onPress={handleUserRegistration}
           />
 
+          <Button
+            title="Sign In"
+            containerStyle={styles.buttonContainer}
+            buttonStyle={styles.signInButton}
+            titleStyle={styles.signInTitle}
+            onPress={handleUserSignIn}
+          />
+
           <View style={styles.orView}>
             <View style={styles.dividerLine} />
             <Text style={{fontSize: 18}}>Or</Text>
@@ -148,6 +159,12 @@ const styles = StyleSheet.create({
   },
   registerButtonTitle: {
     fontSize: 18,
+  },
+  signInButton: {
+    backgroundColor: 'transparent',
+  },
+  signInTitle:{
+    color: '#007bff',
   },
   socialLoginContainer: {
     justifyContent: 'space-evenly',
